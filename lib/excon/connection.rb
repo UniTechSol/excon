@@ -249,14 +249,14 @@ module Excon
       else
         datum
       end
-    rescue => error
-      reset
-      datum[:error] = error
-      if datum[:stack]
-        datum[:stack].error_call(datum)
-      else
-        raise error
-      end
+    # rescue => error
+    #   reset
+    #   datum[:error] = error
+    #   if datum[:stack]
+    #     datum[:stack].error_call(datum)
+    #   else
+    #     raise error
+    #   end
     end
 
     # Sends the supplied requests to the destination host using pipelining.
