@@ -13,20 +13,24 @@ module Excon
       # disable less secure options, when supported
       ssl_context_options = OpenSSL::SSL::SSLContext::DEFAULT_PARAMS[:options]
       if defined?(OpenSSL::SSL::OP_DONT_INSERT_EMPTY_FRAGMENTS)
+        Rails.logger.info "Excon: Don't insert empty fragments"
         ssl_context_options &= ~OpenSSL::SSL::OP_DONT_INSERT_EMPTY_FRAGMENTS
       end
 
       if defined?(OpenSSL::SSL::OP_NO_COMPRESSION)
+        Rails.logger.info "Excon: No compression"
         ssl_context_options |= OpenSSL::SSL::OP_NO_COMPRESSION
       end
       ssl_context.options = ssl_context_options
 
       ssl_context.ciphers = @data[:ciphers]
       if @data[:ssl_version]
+        Rails.logger.info "Excon: SSL Version #{@data[:ssl_version]}"
         ssl_context.ssl_version = @data[:ssl_version]
       end
 
       if @data[:ssl_verify_peer]
+        Rails.logger.info "Excon: Verifying peer"
         # turn verification on
         ssl_context.verify_mode = OpenSSL::SSL::VERIFY_PEER
 
@@ -70,6 +74,7 @@ module Excon
       private_key_pass = @data[:client_key_pass] || @data[:private_key_pass]
 
       if certificate_path && private_key_path
+        Rails.logger.info "Excon: certificate path and private key path"
         ssl_context.cert = OpenSSL::X509::Certificate.new(File.read(certificate_path))
         if OpenSSL::PKey.respond_to? :read
           ssl_context.key = OpenSSL::PKey.read(File.read(private_key_path), private_key_pass)
@@ -86,6 +91,7 @@ module Excon
       end
 
       if @data[:proxy]
+        Rails.logger.info "Excon: Proxy #{@data[:proxy]}"
         request = 'CONNECT ' << @data[:host] << port_string(@data.merge(:omit_default_port => false)) << Excon::HTTP_1_1
         request << 'Host: ' << @data[:host] << port_string(@data) << Excon::CR_NL
 
@@ -111,6 +117,7 @@ module Excon
 
       # Server Name Indication (SNI) RFC 3546
       if @socket.respond_to?(:hostname=)
+        Rails.logger.info "Excon: Hostname #{@data[:host]}"
         @socket.hostname = @data[:host]
       end
 
